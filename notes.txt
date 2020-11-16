@@ -1,0 +1,2 @@
+https://dzone.com/articles/building-active-mq-docker-image-on-k8s
+https://github.com/nikhilbhide/MicroServicesTutorial/tree/master/k8s-docker-activemq
