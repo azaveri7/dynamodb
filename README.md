@@ -18,21 +18,17 @@ message-service and flight-service
    This will setup dynamodb as a pod and expose it as service in minikube cluster.
    
 2. Flight-service:
-   gradle clean build
+   ./gradlew clean build
    Run scripts/docker-images.sh (This will create docker image and push it to docker hub)
    Run scripts/kubectl-deploy-local.sh (This will create pods and deployment)
-   Run command:
-     kubectl port-forward svc/flight-service-svc 8081:8081
    
 3. Message-service:
-   gradle clean build
+   ./gradlew clean build
    Run scripts/docker-images.sh (This will create docker image and push it to docker hub)
    Run scripts/kubectl-deploy.sh (This will create pods and deployment)
-   Run command:
-     kubectl port-forward svc/message-service-svc 8081:8081
 
 4. Service Discovery
-application.properties
+   application.properties
 
 message.service.url=http://message-service-svc.default.svc.cluster.local:8082/message-service
 #amazon.dynamodb.endpoint=http://172.17.0.7:8000/
@@ -56,7 +52,29 @@ nslookup: can't resolve '(null)': Name does not resolve
 Name:      dynamo-svc
 Address 1: 10.96.89.196 dynamo-svc.default.svc.cluster.local
 
-5. Payloads:
+5. # to create Ingress Controller (For Flight-Service)
+cd ingress
+kubectl apply -f ingress.yaml
+ingress.networking.k8s.io/ingress-api-gateway created
+neha@Nehas-MacBook-Pro ingress % kubectl describe ingress
+Warning: extensions/v1beta1 Ingress is deprecated in v1.14+, unavailable in v1.22+; use networking.k8s.io/v1 Ingress
+Name:             ingress-api-gateway
+Namespace:        default
+Address:          192.168.64.2
+Default backend:  default-http-backend:80 (<error: endpoints "default-http-backend" not found>)
+Rules:
+  Host            Path  Backends
+  ----            ----  --------
+  paathshala.com  
+                  /   flight-service-svc:8081   172.17.0.6:8081)
+Annotations:      nginx.ingress.kubernetes.io/rewrite-target: /
+Events:
+  Type    Reason  Age    From                      Message
+  ----    ------  ----   ----                      -------
+  Normal  CREATE  2m51s  nginx-ingress-controller  Ingress default/ingress-api-gateway
+  Normal  UPDATE  2m46s  nginx-ingress-controller  Ingress default/ingress-api-gateway
+
+6. Payloads:
 
 POST: http://localhost:8081/flight-service/add
 Accept: application/json
